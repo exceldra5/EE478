@@ -32,7 +32,7 @@ def clamp(value, min_value, max_value):
 if __name__ == "__main__":
     rospy.init_node("offb_node_py")
 
-    rospy.Subscriber("/mavros/local_position/pose", PoseStamped, callback=pose_callback)
+    rospy.Subscriber("/orb_slam3_ros/camera_pose", PoseStamped, callback=pose_callback)
     rospy.Subscriber("/lookahead_waypoint", PoseStamped, callback=waypoint_callback)
 
     local_vel_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=10)
@@ -45,12 +45,12 @@ if __name__ == "__main__":
             break
         local_vel_pub.publish(cmd_velocity)
 
-    K_P = 0.3
-    K_YAW = 1.0
+    K_P = 0.2
+    K_YAW = 0.8
 
-    MAX_VEL_XY = 1.0   # m/s
-    MAX_VEL_Z  = 0.5   # m/s
-    MAX_YAW_RATE = 0.7 # rad/s
+    MAX_VEL_XY = 0.8
+    MAX_VEL_Z  = 0.4
+    MAX_YAW_RATE = 0.5
 
     while not rospy.is_shutdown():
         # --- position error ---

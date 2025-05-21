@@ -4,6 +4,7 @@ import rospy
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped, Point
 import math
+import numpy as np
 
 class GlobalPlanner:
     def __init__(self):
@@ -11,13 +12,22 @@ class GlobalPlanner:
 
         # Parameters
         self.lookahead_distance = rospy.get_param("~lookahead_distance", 1.0)
-
-        self.global_waypoints = [
-            Point(5, -3, 1),
-            Point(15, 0, 1),
-            Point(7, 8, 1),
-            Point(0, 0, 1),
-        ]
+        
+        # Tree position (assuming tree is at origin)
+        self.tree_position = Point(0, 0, 0)
+        
+        # Generate circular waypoints around the tree
+        radius = 3.0  # meters
+        num_points = 8
+        angles = np.linspace(0, 2*np.pi, num_points)
+        
+        self.global_waypoints = []
+        for angle in angles:
+            x = radius * math.cos(angle)
+            y = radius * math.sin(angle)
+            z = 1.0  # Fixed height
+            self.global_waypoints.append(Point(x, y, z))
+            
         self.global_index = 0
 
         # Current state
@@ -26,7 +36,8 @@ class GlobalPlanner:
 
         # ROS Interfaces
         self.path_sub = rospy.Subscriber("/planning/bspline_path", Path, self.path_callback)
-        self.pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.pose_callback)
+        # Changed to ORB SLAM pose topic
+        self.pose_sub = rospy.Subscriber("/orb_slam3_ros/camera_pose", PoseStamped, self.pose_callback)
 
         self.local_pub = rospy.Publisher("/lookahead_waypoint", PoseStamped, queue_size=1)
         self.global_pub = rospy.Publisher("/move_base_simple/goal", PoseStamped, queue_size=1)
@@ -54,7 +65,16 @@ class GlobalPlanner:
                 waypoint.header.stamp = rospy.Time.now()
                 waypoint.header.frame_id = "odom"
                 waypoint.pose.position = pt
-                waypoint.pose.orientation = pose_stamped.pose.orientation
+                
+                # Calculate orientation to face the tree
+                dx = self.tree_position.x - pt.x
+                dy = self.tree_position.y - pt.y
+                yaw = math.atan2(dy, dx)
+                
+                # Convert yaw to quaternion
+                waypoint.pose.orientation.w = math.cos(yaw/2)
+                waypoint.pose.orientation.z = math.sin(yaw/2)
+                
                 self.local_pub.publish(waypoint)
                 rospy.loginfo("[Local] Lookahead published: x=%.2f y=%.2f z=%.2f", pt.x, pt.y, pt.z)
                 return
@@ -80,7 +100,16 @@ class GlobalPlanner:
         waypoint.header.stamp = rospy.Time.now()
         waypoint.header.frame_id = "odom"
         waypoint.pose.position = goal
-        waypoint.pose.orientation.w = 1.0
+        
+        # Calculate orientation to face the tree
+        dx = self.tree_position.x - goal.x
+        dy = self.tree_position.y - goal.y
+        yaw = math.atan2(dy, dx)
+        
+        # Convert yaw to quaternion
+        waypoint.pose.orientation.w = math.cos(yaw/2)
+        waypoint.pose.orientation.z = math.sin(yaw/2)
+        
         self.global_pub.publish(waypoint)
         rospy.loginfo("[Global] Waypoint %d published: x=%.2f y=%.2f z=%.2f",
                       self.global_index, goal.x, goal.y, goal.z)
