@@ -1,0 +1,8 @@
+prefix=/home/ee/ee478_sooyong/catkin_ws/install
+
+Name: waypoint_mission
+Description: Description of waypoint_mission
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
