@@ -1,4 +1,4 @@
-# Install script for directory: /home/ee/ee478_sooyong/catkin_ws/src/ee478_pid_controller
+# Install script for directory: /home/ee/ee478_sooyong/catkin_ws/src/EE478_pid_controller
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/ee/ee478_sooyong/catkin_ws/build/ee478_pid_controller/catkin_generated/installspace/ee478_pid_controller.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/ee/ee478_sooyong/catkin_ws/build/EE478_pid_controller/catkin_generated/installspace/EE478_pid_controller.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ee478_pid_controller/cmake" TYPE FILE FILES
-    "/home/ee/ee478_sooyong/catkin_ws/build/ee478_pid_controller/catkin_generated/installspace/ee478_pid_controllerConfig.cmake"
-    "/home/ee/ee478_sooyong/catkin_ws/build/ee478_pid_controller/catkin_generated/installspace/ee478_pid_controllerConfig-version.cmake"
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/EE478_pid_controller/cmake" TYPE FILE FILES
+    "/home/ee/ee478_sooyong/catkin_ws/build/EE478_pid_controller/catkin_generated/installspace/EE478_pid_controllerConfig.cmake"
+    "/home/ee/ee478_sooyong/catkin_ws/build/EE478_pid_controller/catkin_generated/installspace/EE478_pid_controllerConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ee478_pid_controller" TYPE FILE FILES "/home/ee/ee478_sooyong/catkin_ws/src/ee478_pid_controller/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/EE478_pid_controller" TYPE FILE FILES "/home/ee/ee478_sooyong/catkin_ws/src/EE478_pid_controller/package.xml")
 endif()
 

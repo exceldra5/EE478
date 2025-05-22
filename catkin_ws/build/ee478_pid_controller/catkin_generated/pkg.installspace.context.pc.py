@@ -3,6 +3,6 @@ CATKIN_PACKAGE_PREFIX = ""
 PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
-PROJECT_NAME = "ee478_pid_controller"
+PROJECT_NAME = "EE478_pid_controller"
 PROJECT_SPACE_DIR = "/home/ee/ee478_sooyong/catkin_ws/install"
 PROJECT_VERSION = "0.0.0"

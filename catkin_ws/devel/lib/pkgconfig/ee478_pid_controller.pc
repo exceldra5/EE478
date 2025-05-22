@@ -1,7 +1,7 @@
 prefix=/home/ee/ee478_sooyong/catkin_ws/devel
 
-Name: ee478_pid_controller
-Description: Description of ee478_pid_controller
+Name: EE478_pid_controller
+Description: Description of EE478_pid_controller
 Version: 0.0.0
 Cflags: 
 Libs: -L${prefix}/lib 

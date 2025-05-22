@@ -40,6 +40,17 @@ if __name__ == "__main__":
     rate = rospy.Rate(20)
 
     cmd_velocity = TwistStamped()
+    
+    # Initialize drone position to (0,0,3)
+    init_pose = PoseStamped()
+    init_pose.pose.position.x = 0.0
+    init_pose.pose.position.y = 0.0
+    init_pose.pose.position.z = 3.0
+    init_pose.pose.orientation.w = 1.0
+    
+    # Wait for 5 seconds to ensure initialization
+    rospy.loginfo("Initializing drone position to (0,0,3)...")
+    rospy.sleep(5.0)
 
     for _ in range(100):
         if rospy.is_shutdown():

@@ -55,8 +55,8 @@ class GlobalPlanner:
                 waypoint.header.stamp = rospy.Time.now()
                 waypoint.header.frame_id = "odom"
                 waypoint.pose.position = pt
-                # 필요하다면 트리 바라보게 orientation 계산
-                dx = 5 - pt.x     # 트리가 (0,0)에 있다면
+                # Calculate orientation to face the tree at (5,0,0)
+                dx = 5 - pt.x     # Tree is at (5,0,0)
                 dy = 0 - pt.y
                 yaw = math.atan2(dy, dx)
                 waypoint.pose.orientation.w = math.cos(yaw/2)
@@ -87,7 +87,12 @@ class GlobalPlanner:
         waypoint.header.stamp = rospy.Time.now()
         waypoint.header.frame_id = "odom"
         waypoint.pose.position = goal
-        waypoint.pose.orientation.w = 1.0
+        # Calculate orientation to face the tree at (5,0,0)
+        dx = 5 - goal.x
+        dy = 0 - goal.y
+        yaw = math.atan2(dy, dx)
+        waypoint.pose.orientation.w = math.cos(yaw/2)
+        waypoint.pose.orientation.z = math.sin(yaw/2)
         self.global_pub.publish(waypoint)
         rospy.loginfo("[Global] Waypoint %d published: x=%.2f y=%.2f z=%.2f",
                       self.global_index, goal.x, goal.y, goal.z)
