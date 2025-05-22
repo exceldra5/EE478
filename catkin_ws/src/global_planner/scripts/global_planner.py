@@ -4,6 +4,7 @@ import rospy
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped, Point
 import math
+import numpy as np
 
 class GlobalPlanner:
     def __init__(self):
@@ -13,10 +14,10 @@ class GlobalPlanner:
         self.lookahead_distance = rospy.get_param("~lookahead_distance", 1.0)
 
         self.global_waypoints = [
-            Point(5, -3, 1),
-            Point(15, 0, 1),
-            Point(7, 8, 1),
-            Point(0, 0, 1),
+            Point(5, -5, 0),
+            Point(10, 0, 0),
+            Point(5, 5, 0),
+            Point(0, 0, 0),
         ]
         self.global_index = 0
 
@@ -24,9 +25,9 @@ class GlobalPlanner:
         self.cur_position = None
         self.path = None
 
-        # ROS Interfaces
-        self.path_sub = rospy.Subscriber("/planning/bspline_path", Path, self.path_callback)
-        self.pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.pose_callback)
+        # Change to ORB-SLAM3 pose topic
+        # self.pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.pose_callback)
+        self.pose_sub = rospy.Subscriber("/orb_slam3/camera_pose", PoseStamped, self.pose_callback)
 
         self.local_pub = rospy.Publisher("/lookahead_waypoint", PoseStamped, queue_size=1)
         self.global_pub = rospy.Publisher("/move_base_simple/goal", PoseStamped, queue_size=1)
@@ -43,18 +44,24 @@ class GlobalPlanner:
         self.publish_lookahead_point()
 
     def publish_lookahead_point(self):
-        if self.cur_position is None or self.path is None:
-            return
+        if self.cur_position is None:
+             return
         
-        for pose_stamped in self.path:
-            pt = pose_stamped.pose.position
+        for pt in self.global_waypoints[self.global_index:]:
             dist = self.euclidean_distance(pt, self.cur_position)
             if dist >= self.lookahead_distance:
+
                 waypoint = PoseStamped()
                 waypoint.header.stamp = rospy.Time.now()
                 waypoint.header.frame_id = "odom"
                 waypoint.pose.position = pt
-                waypoint.pose.orientation = pose_stamped.pose.orientation
+                # 필요하다면 트리 바라보게 orientation 계산
+                dx = 5 - pt.x     # 트리가 (0,0)에 있다면
+                dy = 0 - pt.y
+                yaw = math.atan2(dy, dx)
+                waypoint.pose.orientation.w = math.cos(yaw/2)
+                waypoint.pose.orientation.z = math.sin(yaw/2)
+
                 self.local_pub.publish(waypoint)
                 rospy.loginfo("[Local] Lookahead published: x=%.2f y=%.2f z=%.2f", pt.x, pt.y, pt.z)
                 return
