@@ -12,6 +12,7 @@ class GlobalPlanner:
 
         # Parameters
         self.lookahead_distance = rospy.get_param("~lookahead_distance", 1.0)
+        self.scale_factor = rospy.get_param("~scale_factor", 1.2)  # Adjust this value based on your setup
 
         self.global_waypoints = [
             Point(5, -5, 0),
@@ -35,7 +36,12 @@ class GlobalPlanner:
         self.arrival_threshold = 0.7
 
     def pose_callback(self, msg):
+        # Apply scale factor to the current position
         self.cur_position = msg.pose.position
+        self.cur_position.x *= self.scale_factor
+        self.cur_position.y *= self.scale_factor
+        self.cur_position.z *= self.scale_factor
+        
         self.publish_lookahead_point()
         self.check_and_publish_global()
 
@@ -45,12 +51,11 @@ class GlobalPlanner:
 
     def publish_lookahead_point(self):
         if self.cur_position is None:
-             return
+            return
         
         for pt in self.global_waypoints[self.global_index:]:
             dist = self.euclidean_distance(pt, self.cur_position)
             if dist >= self.lookahead_distance:
-
                 waypoint = PoseStamped()
                 waypoint.header.stamp = rospy.Time.now()
                 waypoint.header.frame_id = "odom"
