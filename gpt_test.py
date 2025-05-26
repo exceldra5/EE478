@@ -2,6 +2,8 @@ import time
 from openai import OpenAI
 import os
 import ast, re
+import rospy
+from std_msgs.msg import String
 
 organization_key = "-"
 api_key = "-"
@@ -26,8 +28,7 @@ def clean_tag_id(problem_text):
     return "\n".join(cleaned_lines)
 
 def GPTTaskPlan(parsed_problem):
-    parsed_problem = clean_tag_id(problem_text)
-    # print(parsed_problem)
+    parsed_problem = clean_tag_id(parsed_problem)
     prompt = f"""
 You are controlling an autonomous drone navigating through a field.
 There is a gate ahead, and you must decide whether to go LEFT or RIGHT based on the following problem.
@@ -75,16 +76,35 @@ Here is the problem:
     else:
         direction = "UNKNOWN"
     
-    # print(f"Full response: {result}")
     print(f"direction: {direction}")
     return direction
 
+class GPTNode:
+    def __init__(self):
+        # Initialize ROS node
+        rospy.init_node('gpt_node', anonymous=True)
+        
+        # Create publisher for direction
+        self.direction_pub = rospy.Publisher('drone_direction', String, queue_size=10)
+        
+        # Create subscriber for QR codes
+        rospy.Subscriber('qr_codes', String, self.qr_callback)
+        
+        rospy.loginfo("GPT Node initialized")
+        
+    def qr_callback(self, msg):
+        # When QR code is received, process it and publish direction
+        direction = GPTTaskPlan(msg.data)
+        
+        # Publish the direction
+        direction_msg = String()
+        direction_msg.data = direction
+        self.direction_pub.publish(direction_msg)
+        rospy.loginfo(f"Published direction: {direction}")
 
-# 예시 문제
-problem_text = """
-LEFT: Tag ID: 12
-RIGHT: Tag ID: 17
-Q: Which number is not prime?
-"""
-
-GPTTaskPlan(problem_text)
+if __name__ == '__main__':
+    try:
+        gpt_node = GPTNode()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
